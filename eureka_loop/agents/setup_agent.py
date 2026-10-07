@@ -1,34 +1,38 @@
+import typing
 import yaml
+
 from google.adk.agents import BaseAgent
 from google.adk.agents.invocation_context import InvocationContext
 from google.adk.events import Event
-from typing import AsyncGenerator
 from loguru import logger
 
 from ..tools.brax_env import get_env_and_source
 from ..tools.artifacts import init_run_dir, init_leaderboard, save_json
 
 
-def _load_yaml(path):
+def _load_yaml(path: str) -> typing.Any:
     """Load YAML file with error handling."""
     try:
-        with open(path, "r") as f:
+        with open(path, "r", encoding="utf-8") as f:
             data = yaml.safe_load(f)
-            if data is None:
-                raise ValueError(f"YAML file {path} is empty or contains no data")
-            return data
-    except FileNotFoundError:
-        raise FileNotFoundError(f"Configuration file not found: {path}")
+
+        if data is None:
+            raise ValueError(f"YAML file {path} is empty or contains no data")
+        return data
+    except FileNotFoundError as e:
+        raise FileNotFoundError(f"Configuration file not found: {path}") from e
     except yaml.YAMLError as e:
-        raise ValueError(f"Failed to parse YAML file {path}: {e}")
+        raise ValueError(f"Failed to parse YAML file {path}: {e}") from e
     except Exception as e:
-        raise ValueError(f"Error loading YAML file {path}: {e}")
+        raise ValueError(f"Error loading YAML file {path}: {e}") from e
 
 
 class SetupAgent(BaseAgent):
+    """Initialize loop state, artifacts, and baseline environment setup."""
+
     async def _run_async_impl(
         self, ctx: InvocationContext
-    ) -> AsyncGenerator[Event, None]:
+    ) -> typing.AsyncGenerator[Event, None]:
         if ctx.session.state.get("_setup_done", False):
             yield Event(author=self.name, content=None)
             return
@@ -57,7 +61,8 @@ class SetupAgent(BaseAgent):
             or loop_cfg["candidates_per_iteration"] < 1
         ):
             raise ValueError(
-                f"candidates_per_iteration must be a positive integer, got {loop_cfg['candidates_per_iteration']}"
+                "candidates_per_iteration must be a positive integer, "
+                f"got {loop_cfg['candidates_per_iteration']}"
             )
         if not isinstance(loop_cfg["train_steps"], int) or loop_cfg["train_steps"] < 1:
             raise ValueError(
@@ -78,14 +83,16 @@ class SetupAgent(BaseAgent):
             or task_spec["evaluation"]["episodes"] < 1
         ):
             raise ValueError(
-                f"evaluation.episodes must be a positive integer, got {task_spec['evaluation']['episodes']}"
+                "evaluation.episodes must be a positive integer, "
+                f"got {task_spec['evaluation']['episodes']}"
             )
         if (
             not isinstance(task_spec["evaluation"]["horizon"], int)
             or task_spec["evaluation"]["horizon"] < 1
         ):
             raise ValueError(
-                f"evaluation.horizon must be a positive integer, got {task_spec['evaluation']['horizon']}"
+                "evaluation.horizon must be a positive integer, "
+                f"got {task_spec['evaluation']['horizon']}"
             )
 
         outdir = init_run_dir()
@@ -146,11 +153,13 @@ class SetupAgent(BaseAgent):
                 horizon=video_horizon,
             )
             logger.info(
-                "[SetupAgent] Saved baseline rollout (rollout_baseline.html) - shows original environment behavior"
+                "[SetupAgent] Saved baseline rollout "
+                "(rollout_baseline.html) - shows original environment behavior"
             )
         except Exception as baseline_err:
             logger.warning(
-                f"[SetupAgent] Baseline rollout failed (non-critical): {baseline_err}. Continuing..."
+                "[SetupAgent] Baseline rollout failed (non-critical): "
+                f"{baseline_err}. Continuing..."
             )
 
         yield Event(author=self.name, content=None)

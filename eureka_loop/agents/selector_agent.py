@@ -16,7 +16,8 @@ class SelectorAgent(BaseAgent):
         # Check if candidate_results exists
         if "candidate_results" not in ctx.session.state:
             raise ValueError(
-                "[SelectorAgent] 'candidate_results' not found in session state. CandidateEvaluatorAgent may not have run successfully."
+                "[SelectorAgent] 'candidate_results' not found in session state. "
+                "CandidateEvaluatorAgent may not have run successfully."
             )
 
         try:
@@ -27,9 +28,12 @@ class SelectorAgent(BaseAgent):
                 f"[SelectorAgent] Failed to parse candidate_results as JSON: {e}"
             )
             logger.error(
-                f"[SelectorAgent] candidate_results content (first 500 chars): {ctx.session.state['candidate_results'][:500]}"
+                "[SelectorAgent] candidate_results content (first 500 chars): "
+                f"{ctx.session.state['candidate_results'][:500]}"
             )
-            raise ValueError(f"[SelectorAgent] Invalid JSON in candidate_results: {e}")
+            raise ValueError(
+                f"[SelectorAgent] Invalid JSON in candidate_results: {e}"
+            ) from e
 
         if not results:
             # Check for different error scenarios
@@ -77,7 +81,8 @@ class SelectorAgent(BaseAgent):
         best_idx = int(np.argmax(scores))
         best = results[best_idx]
         logger.info(
-            f"[SelectorAgent] Selected candidate {best_idx + 1} (0-indexed: {best_idx}) with score={scores[best_idx]:.2f}"
+            f"[SelectorAgent] Selected candidate {best_idx + 1} "
+            f"(0-indexed: {best_idx}) with score={scores[best_idx]:.2f}"
         )
 
         # Validate required keys exist
@@ -98,10 +103,12 @@ class SelectorAgent(BaseAgent):
         ctx.session.state["best_return"] = float(best["eval"]["avg_return"])
 
         logger.info(
-            f"[SelectorAgent] Selection complete. Best return: {ctx.session.state['best_return']:.2f}"
+            "[SelectorAgent] Selection complete. "
+            f"Best return: {ctx.session.state['best_return']:.2f}"
         )
         logger.debug(
-            f"[SelectorAgent] Best candidate summary: {ctx.session.state['best_candidate_summary'][:200]}..."
+            "[SelectorAgent] Best candidate summary: "
+            f"{ctx.session.state['best_candidate_summary'][:200]}..."
         )
 
         yield Event(author=self.name, content=None)
