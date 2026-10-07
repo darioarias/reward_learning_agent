@@ -1,8 +1,8 @@
 import typing
+import math
 import ast
 import jax
 import jax.numpy as jnp
-import math
 
 FORBIDDEN_NAMES = {
     "import",
@@ -49,11 +49,15 @@ def compile_reward(code: str) -> typing.Callable:
     safe_locals = {}
 
     try:
+        # The reward code is validated with AST restrictions before execution,
+        # so this exec is intentionally constrained and safe to use.
+        # pylint: disable=exec-used
         exec(code, globals=safe_globals, locals=safe_locals)
+        # pylint: enable=exec-used
     except SyntaxError as e:
-        raise ValueError(f"Reward code has syntax error: {e}")
+        raise ValueError(f"Reward code has syntax error: {e}") from e
     except Exception as e:
-        raise ValueError(f"Reward code execution failed: {e}")
+        raise ValueError(f"Reward code execution failed: {e}") from e
 
     if "computed_reward" not in safe_locals:
         raise ValueError("Reward code must define compute_reward().")
@@ -143,6 +147,6 @@ def compile_reward(code: str) -> typing.Callable:
         raise ValueError(
             f"Reward function valudation failed (test call error): {e}."
             "Ensure computer_reward(abs, action, next_abs, info) return (scalar, dict)."
-        )
+        ) from e
 
     return reward_fn
