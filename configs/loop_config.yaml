@@ -1,0 +1,16 @@
+env_name: "halfcheetah"
+iterations: 5
+candidates_per_iteration: 2
+train_steps: 200000
+seed: 0
+
+llm_provider: "openai"
+
+# Early-exit criteria (threshold + plateau)
+return_threshold: 2500
+plateau_delta: 100
+plateau_patience: 2
+
+# Note: Rollout visualizations are saved as interactive HTML viewers (rollout.html)
+# The HTML viewer provides an interactive 3D animation that can be played, paused,
+# scrubbed, and rotated - no MP4 needed!

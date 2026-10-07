@@ -1,0 +1,10 @@
+task_name: "HalfCheetah Forward Locomotion"
+objective: "Run forward as fast as possible while staying stable and using smooth, energy-efficient actions."
+success_metric: "Average forward velocity in evaluation rollout."
+constraints:
+  - "Reward must be numerically stable and bounded."
+  - "Avoid extremely high control penalties that cause freezing."
+  - "Avoid purely sparse reward; include shaping."
+evaluation:
+  horizon: 1000
+  episodes: 1
