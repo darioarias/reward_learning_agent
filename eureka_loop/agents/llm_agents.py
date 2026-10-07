@@ -1,5 +1,7 @@
 import os
 import json
+from typing import AsyncGenerator
+
 from openai import OpenAI
 from pydantic import PrivateAttr
 from loguru import logger
@@ -7,7 +9,6 @@ from loguru import logger
 from google.adk.agents import BaseAgent
 from google.adk.agents.invocation_context import InvocationContext
 from google.adk.events import Event
-from typing import AsyncGenerator
 
 client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 

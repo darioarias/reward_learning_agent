@@ -74,7 +74,8 @@ class CandidateEvaluatorAgent(BaseAgent):
         candidates = candidates[:K]
 
         logger.info(
-            f"[CandidateEvaluatorAgent] Parsed {len(candidates)} candidates from LLM output (expected {K})"
+            f"[CandidateEvaluatorAgent] Parsed {len(candidates)} "
+            "candidates from LLM output (expected {K})"
         )
 
         if not candidates:
@@ -104,11 +105,13 @@ class CandidateEvaluatorAgent(BaseAgent):
             try:
                 reward_fn = compile_reward(code)
                 logger.debug(
-                    f"[CandidateEvaluatorAgent] Candidate {i}: Reward function compiled and validated successfully"
+                    f"[CandidateEvaluatorAgent] Candidate {i}: "
+                    "Reward function compiled and validated successfully"
                 )
 
                 logger.info(
-                    f"[CandidateEvaluatorAgent] Candidate {i}: Training policy (this may take a while)..."
+                    f"[CandidateEvaluatorAgent] Candidate {i}: "
+                    "Training policy (this may take a while)..."
                 )
 
                 # Clear JAX cache before training to prevent memory buildup
@@ -161,7 +164,8 @@ class CandidateEvaluatorAgent(BaseAgent):
 
                 try:
                     logger.info(
-                        f"[CandidateEvaluatorAgent] Candidate {i}: Rendering interactive HTML viewer..."
+                        f"[CandidateEvaluatorAgent] Candidate {i}: "
+                        "Rendering interactive HTML viewer..."
                     )
                     save_policy_rollout_html(
                         out_dir=cdir,
@@ -173,11 +177,13 @@ class CandidateEvaluatorAgent(BaseAgent):
                         horizon=video_horizon,
                     )
                     logger.info(
-                        f"[CandidateEvaluatorAgent] Candidate {i}: Saved interactive HTML viewer (rollout.html)"
+                        f"[CandidateEvaluatorAgent] Candidate {i}: "
+                        "Saved interactive HTML viewer (rollout.html)"
                     )
                 except Exception as render_err:
                     logger.warning(
-                        f"[CandidateEvaluatorAgent] Candidate {i}: HTML viewer rendering failed (non-critical): {render_err}. Continuing..."
+                        f"[CandidateEvaluatorAgent] Candidate {i}: "
+                        f"HTML viewer rendering failed (non-critical): {render_err}. Continuing..."
                     )
 
                 save_json(cdir / "train_metrics.json", train_metrics)
@@ -185,7 +191,8 @@ class CandidateEvaluatorAgent(BaseAgent):
                 save_json(cdir / "score.json", {"score": score})
 
                 # Save metadata needed to regenerate visualizations later
-                # This includes training config AND network architecture so we can recreate the inference function
+                # This includes training config AND network architecture
+                # so we can recreate the inference function
                 save_json(
                     cdir / "training_metadata.json",
                     {
@@ -195,7 +202,8 @@ class CandidateEvaluatorAgent(BaseAgent):
                         "env_name": env_name,
                         "network_config": network_config,  # Critical: observation_size, action_size
                         "note": (
-                            "To regenerate visualizations: Use recreate_inference_fn() with saved params and network_config. "
+                            "To regenerate visualizations: Use recreate_inference_fn() "
+                            "with saved params and network_config. "
                             "This avoids retraining and dimension mismatches."
                         ),
                     },
@@ -210,7 +218,8 @@ class CandidateEvaluatorAgent(BaseAgent):
                     )
                 except Exception as save_error:
                     logger.warning(
-                        f"[CandidateEvaluatorAgent] Candidate {i}: Failed to save policy parameters: {save_error}. "
+                        f"[CandidateEvaluatorAgent] Candidate {i}: "
+                        f"Failed to save policy parameters: {save_error}. "
                         f"Evaluation succeeded but params not saved."
                     )
                     # Save error to a separate file for debugging
@@ -226,7 +235,8 @@ class CandidateEvaluatorAgent(BaseAgent):
                 )
 
                 logger.info(
-                    f"[CandidateEvaluatorAgent] Candidate {i}: Success! Score={score:.2f}, Avg Return={eval_metrics['avg_return']:.2f}"
+                    f"[CandidateEvaluatorAgent] Candidate {i}: "
+                    f"Success! Score={score:.2f}, Avg Return={eval_metrics['avg_return']:.2f}"
                 )
 
                 results.append(
@@ -245,7 +255,8 @@ class CandidateEvaluatorAgent(BaseAgent):
                 error_type = type(e).__name__
                 error_summary.append(f"Candidate {i}: {error_type}: {error_msg}")
                 logger.error(
-                    f"[CandidateEvaluatorAgent] Candidate {i}: Failed with {error_type}: {error_msg}"
+                    f"[CandidateEvaluatorAgent] Candidate {i}: "
+                    f"Failed with {error_type}: {error_msg}"
                 )
 
                 # Save detailed error information
